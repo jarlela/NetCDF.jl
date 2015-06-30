@@ -1,7 +1,7 @@
 jltype2nctype={Int8=>NC_BYTE,
-	           Int16=>NC_SHORT,
+	       Int16=>NC_SHORT,
                Int32=>NC_INT,
-               Int64=>NC_LONG,
+               Int64=>NC_INT64,
                Float32=>NC_FLOAT,
                Float64=>NC_DOUBLE}
 
@@ -102,6 +102,8 @@ function _nc_put_att(ncid::Integer,varid::Integer,name,val)
     _nc_put_att_short_c(ncid,varid,name,attype,attlen,val)
   elseif (attype==NC_INT)
     _nc_put_att_int_c(ncid,varid,name,attype,attlen,int32(val))
+  elseif (attype==NC_INT64)
+    _nc_put_att_longlong_c(ncid,varid,name,attype,attlen,int64(val))
   elseif (attype==NC_FLOAT)
     _nc_put_att_float_c(ncid,varid,name,attype,attlen,val)
   elseif (attype==NC_DOUBLE)
@@ -109,6 +111,7 @@ function _nc_put_att(ncid::Integer,varid::Integer,name,val)
   elseif (attype==NC_BYTE)
     _nc_put_att_byte_c(ncid,varid,name,attype,attlen,val)
   else
+    println("No write")
     valsa="Could not read attribute, currently unsupported datatype by the netcdf package"  
   end
 end
@@ -124,9 +127,9 @@ function _nc_get_att(ncid::Integer,varid::Integer,name,attype::Integer,attlen::I
   elseif (attype==NC_INT)
     valsa=Array(Int32,attlen)
     _nc_get_att_int_c(ncid,varid,name,valsa)
-  elseif (attype==NC_LONG)
+  elseif (attype==NC_INT64)
     valsa=Array(Int64,attlen)
-    _nc_get_att_long_c(ncid,varid,name,valsa)
+    _nc_get_att_longlong_c(ncid,varid,name,valsa)
   elseif (attype==NC_FLOAT)
     valsa=Array(Float32,attlen)
     _nc_get_att_float_c(ncid,varid,name,valsa)
@@ -292,7 +295,7 @@ function finalizedim(dimlen,dimvals,dimatts,name)
     dimvals=float64([1:dimlen])
   end
   if (dimatts==nothing)
-    dimatts={"missval"=>-9999}
+    dimatts={"missval"=>int32(-9999)}
   end
   return(NcDim(name,dimvals,dimatts))
 end

@@ -13,7 +13,7 @@ const NC_BYTE = 1
 const NC_CHAR = 2
 const NC_SHORT = 3
 const NC_INT = 4
-const NC_LONG = 
+const NC_LONG = 4
 const NC_FLOAT = 5
 const NC_DOUBLE = 6
 const NC_UBYTE = 7
@@ -37,7 +37,7 @@ const NC_FILL_DOUBLE = (9.9692099683868690e+36)
 const NC_FILL_UBYTE = (255)
 const NC_FILL_USHORT = (65535)
 const NC_FILL_UINT = (4294967295U)
-# Skipping MacroDefinition: NC_FILL_INT64((longlong)-9223372036854775806LL)
+const NC_FILL_INT64(-9223372036854775806LL)
 # Skipping MacroDefinition: NC_FILL_UINT64((unsignedlonglong)18446744073709551614ULL)
 const NC_FILL_STRING = ""
 const NC_MAX_BYTE = 127

@@ -25,7 +25,7 @@ end
 
 # Creating Files
 nc1 = NetCDF.create("nc1.nc",v1,mode=NC_NETCDF4);
-nc2 = NetCDF.create("nc2.nc",[v2,v3],gatts={"Some global attributes"=>2010},mode=NC_64BIT_OFFSET);
+nc2 = NetCDF.create("nc2.nc",[v2,v3],gatts={"Some global attributes"=>int32(2010)},mode=NC_64BIT_OFFSET);
 nc3 = NetCDF.create("nc3.nc",vt,mode=NC_CLASSIC_MODEL);
 
 #Test Adding attributes
@@ -34,6 +34,7 @@ NetCDF.putatt(nc1,"global",{"Additional global attribute"=>"gatt"})
 NetCDF.putatt(nc1,"global",{"Additional Int8 attribute"=>int8(20),
 							"Additional Int16 attribute"=>int16(20),
 							"Additional Int32 attribute"=>int32(20),
+							"Additional Int64 attribute"=>int64(20),
 							"Additional Float32 attribute"=>float32(20),
 							"Additional Float64 attribute"=>float64(20)})
 NetCDF.putatt(nc1,"v1",    {"Additional Int8 array attribute"=>int8([1:20]),
@@ -92,24 +93,27 @@ end
 
 nccreate("nc1.nc","v1","Dim1",[1,2,3],{"units"=>"deg C"},"Dim2",[1:10],"Dim3",20,{"max"=>10},
 mode=NC_NETCDF4)
-nccreate("nc2.nc","v2","Dim1",[1,2,3],{"units"=>"deg C"},"Dim2",[1:10],"Dim3",20,{"max"=>10},
-atts={"a1"=>"varatts"},gatts={"Some global attributes"=>2010},mode=NC_64BIT_OFFSET)
+nccreate("nc2.nc","v2","Dim1",[1,2,3],{"units"=>"deg C"},"Dim2",[1:10],"Dim3",20,{"max"=>int32(10)},
+atts={"a1"=>"varatts"},gatts={"Some global attributes"=>int32(2010)},mode=NC_64BIT_OFFSET)
 nccreate("nc2.nc","v3","Dim1",mode=NC_CLASSIC_MODEL)
 tlist = [Float64, Float32, Int32, Int16, Int8]
 for i = 1:length(tlist)
 	nccreate("nc3.nc","vt$i","Dim2",[1:10],t=tlist[i])
 end
+nccreate("nc1.nc","vi64","Dim2",[1:10],t=Int64)
 
 ncputatt("nc1.nc","v1",{"Additional String attribute"=>"att"})
 ncputatt("nc1.nc","global",{"Additional global attribute"=>"gatt"})
 ncputatt("nc1.nc","global",{"Additional Int8 attribute"=>int8(20),
 							"Additional Int16 attribute"=>int16(20),
 							"Additional Int32 attribute"=>int32(20),
+							"Additional Int64 attribute"=>int64(20),
 							"Additional Float32 attribute"=>float32(20),
 							"Additional Float64 attribute"=>float64(20)})
 ncputatt("nc1.nc","v1",    {"Additional Int8 array attribute"=>int8([1:20]),
 							"Additional Int16 array attribute"=>int16([1:20]),
 							"Additional Int32 array attribute"=>int32([1:20]),
+							"Additional Int64 array attribute"=>int64([1:20]),
 							"Additional Float32 array attribute"=>float32([1:20]),
 							"Additional Float64 array attribute"=>float64([1:20])})
 
@@ -120,10 +124,12 @@ xt=Array(Any,length(tlist))
 for i=1:length(tlist)
     xt[i]=rand(tlist[i],10)
 end
+xi64 = rand(Int64,10)
 #
 # And write it
 #
 ncwrite(x1,"nc1.nc","v1")
+ncwrite(xi64,"nc1.nc","vi64")
 #Test sequential writing along one dimension
 for i=1:10
   ncwrite(x2[:,i,:],"nc2.nc","v2",start=[1,i,1],count=[-1,1,-1])

@@ -1,19 +1,21 @@
 module NetCDF
 include("netcdf_c_wrappers.jl")
 import Base.show
-export show,NcDim,NcVar,NcFile,ncread,ncread!,ncwrite,nccreate,ncsync,ncinfo,ncclose,ncputatt,NC_BYTE,NC_SHORT,NC_INT,NC_FLOAT,NC_DOUBLE, ncgetatt,NC_NOWRITE,NC_WRITE,NC_CLOBBER,NC_NOCLOBBER,NC_CLASSIC_MODEL,NC_64BIT_OFFSET,NC_NETCDF4
+export show,NcDim,NcVar,NcFile,ncread,ncread!,ncwrite,nccreate,ncsync,ncinfo,ncclose,ncputatt,NC_BYTE,NC_SHORT,NC_INT,NC_INT64,NC_FLOAT,NC_DOUBLE, ncgetatt,NC_NOWRITE,NC_WRITE,NC_CLOBBER,NC_NOCLOBBER,NC_CLASSIC_MODEL,NC_64BIT_OFFSET,NC_NETCDF4
 #Some constants
 
 
 jltype2nctype={ Int8=>NC_BYTE,
                 Int16=>NC_SHORT,
                 Int32=>NC_INT,
+                Int64=>NC_INT64,
                 Float32=>NC_FLOAT,
                 Float64=>NC_DOUBLE}
 
 nctype2string={ NC_BYTE=>"BYTE",
                 NC_SHORT=>"SHORT",
                 NC_INT=>"INT",
+                NC_INT64=>"INT64",
                 NC_FLOAT=>"FLOAT",
                 NC_DOUBLE=>"DOUBLE"}
 
@@ -117,6 +119,7 @@ function readvar{T<:Integer}(nc::NcFile, varname::String;start::Array{T,1}=Array
         
     retvalsa = nc.vars[varname].nctype==NC_DOUBLE ? Array(Float64,p) :
                nc.vars[varname].nctype==NC_FLOAT ? Array(Float32,p) :
+               nc.vars[varname].nctype==NC_INT64 ? Array(Int64,p) :
                nc.vars[varname].nctype==NC_INT ? Array(Int32,p) :
                nc.vars[varname].nctype==NC_SHORT ? Array(Int32,p) :
                nc.vars[varname].nctype==NC_CHAR ? Array(Uint8,p) :
@@ -137,6 +140,7 @@ end
 
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Float64})=_nc_get_vara_double_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Float32})=_nc_get_vara_float_c(ncid,varid,start,count,retvalsa)
+nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int64})=_nc_get_vara_longlong_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int32})=_nc_get_vara_int_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Uint8})=_nc_get_vara_text_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int8})=_nc_get_vara_schar_c(ncid,varid,start,count,retvalsa)
@@ -191,6 +195,8 @@ function putvar{T<:Integer}(nc::NcFile,varname::String,vals::Array;start::Array{
     _nc_put_vara_double_c(ncid,varid,start,count,float64(x))
   elseif nc.vars[varname].nctype==NC_FLOAT
     _nc_put_vara_float_c(ncid,varid,start,count,float32(x))
+  elseif nc.vars[varname].nctype==NC_INT64
+    _nc_put_vara_longlong_c(ncid,varid,start,count,int64(x))
   elseif nc.vars[varname].nctype==NC_INT
     _nc_put_vara_int_c(ncid,varid,start,count,int32(x))
   elseif nc.vars[varname].nctype==NC_SHORT
