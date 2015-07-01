@@ -85,7 +85,7 @@ for (jlname, fname, outtype, argtypes, argsyms, ex_error) in
       (:_nc_put_att_int_c,:nc_put_att_int,Int32,(Int32,Int32,Ptr{Uint8},Int32,Int32,Ptr{Int32}),(:ncid,:varid,:name,:nctype,:size,:valsa),:(error("Error writing attribute"))),
       (:_nc_put_att_longlong_c,:nc_put_att_longlong,Int32,(Int32,Int32,Ptr{Uint8},Int32,Int32,Ptr{Int64}),(:ncid,:varid,:name,:nctype,:size,:valsa),:(error("Error writing attribute"))),
       (:_nc_put_att_float_c,:nc_put_att_float,Int32,(Int32,Int32,Ptr{Uint8},Int32,Int32,Ptr{Float32}),(:ncid,:varid,:nctype,:size,:name,:valsa),:(error("Error writing attribute"))),
-      (:_nc_put_att_double_c,:nc_put_att_int,Int32,(Int32,Int32,Ptr{Uint8},Int32,Int32,Ptr{Float64}),(:ncid,:varid,:name,:nctype,:size,:valsa),:(error("Error writing attribute"))),
+      (:_nc_put_att_double_c,:nc_put_att_double,Int32,(Int32,Int32,Ptr{Uint8},Int32,Int32,Ptr{Float64}),(:ncid,:varid,:name,:nctype,:size,:valsa),:(error("Error writing attribute"))),
       (:_nc_put_att_byte_c,:nc_put_att,Int32,(Int32,Int32,Ptr{Uint8},Int32,Int32,Ptr{Int8}),(:ncid,:varid,:name,:nctype,:size,:valsa),:(error("Error writing attribute"))),
       
       (:_nc_get_vara_double_c,:nc_get_vara_double,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Float64}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error reading variable"))),

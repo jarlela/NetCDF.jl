@@ -107,7 +107,7 @@ function _nc_put_att(ncid::Integer,varid::Integer,name,val)
   elseif (attype==NC_FLOAT)
     _nc_put_att_float_c(ncid,varid,name,attype,attlen,val)
   elseif (attype==NC_DOUBLE)
-    _nc_put_att_float_c(ncid,varid,name,NC_FLOAT,attlen,float32(val))
+    _nc_put_att_double_c(ncid,varid,name,attype,attlen,val)
   elseif (attype==NC_BYTE)
     _nc_put_att_byte_c(ncid,varid,name,attype,attlen,val)
   else
