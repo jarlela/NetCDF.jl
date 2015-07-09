@@ -81,13 +81,13 @@ include("netcdf_helpers.jl")
 global currentNcFiles=Dict{String,NcFile}()  
 
 # Read block of data from file
-function readvar!{T<:Integer}(nc::NcFile, varname::String, retvalsa::Array;start::Array{T,1}=ones(Int,ndims(vals)),count::Array{T,1}=Array(Int,size(vals)))
+function readvar!{T<:Integer}(nc::NcFile, varname::String, retvalsa::Array;start::Array{T,1}=ones(Int,ndims(retvalsa)),count::Array{T,1}=fill(-1,ndims(retvalsa)))
   ncid=nc.ncid
   haskey(nc.vars,varname) ? nothing : error("NetCDF file $(nc.name) does not have variable $varname")
   if length(start) == 0 start=ones(Int,nc.vars[varname].ndim) end
-  if length(count) == 0 count=-ones(Int,nc.vars[varname].ndim) end
   if length(start) != nc.vars[varname].ndim error("Length of start ($(length(start))) must equal the number of variable dimensions ($(nc.vars[varname].ndim))") end
-  if length(count) != nc.vars[varname].ndim error("Length of start ($(length(count))) must equal the number of variable dimensions ($(nc.vars[varname].ndim))") end
+  if length(count) == 0 count=-ones(Int,nc.vars[varname].ndim) end
+  if length(count) != nc.vars[varname].ndim error("Length of count ($(length(count))) must equal the number of variable dimensions ($(nc.vars[varname].ndim))") end
   
   for i = 1:length(count)
     if count[i] <= 0 count[i] = nc.vars[varname].dim[i].dimlen end
@@ -95,7 +95,7 @@ function readvar!{T<:Integer}(nc::NcFile, varname::String, retvalsa::Array;start
   
   p=prod(count) #Determine size of Array
   
-  length(retvalsa) != p && error("Size of output array does not equal number of elements to be read!")
+  length(retvalsa) < p && error("Size of output array does not equal number of elements to be read!")
   
   count=Uint[count[i] for i in length(count):-1:1]
   start=Uint[start[i]-1 for i in length(start):-1:1]
@@ -386,7 +386,7 @@ function ncread{T<:Integer}(fil::String,vname::String;start::Array{T}=Array(Int,
   return x
 end
 ncread{T<:Integer}(fil::String,vname::String,start::Array{T,1},count::Array{T,1})=ncread(fil,vname,start=start,count=count)
-function ncread!{T<:Integer}(fil::String,vname::String,vals::Array;start::Array{T}=ones(Int,ndims(vals)),count::Array{T}=Array(Int,size(vals)))
+function ncread!{T<:Integer}(fil::String,vname::String,vals::Array;start::Array{T}=ones(Int,ndims(vals)),count::Array{T}=fill(-1,ndims(vals)))
   nc = haskey(currentNcFiles,abspath(fil)) ? currentNcFiles[abspath(fil)] : open(fil)
   x  = readvar!(nc,vname,vals,start=start,count=count)
   return x
