@@ -3,7 +3,8 @@ jltype2nctype={Int8=>NC_BYTE,
                Int32=>NC_INT,
                Int64=>NC_INT64,
                Float32=>NC_FLOAT,
-               Float64=>NC_DOUBLE}
+               Float64=>NC_DOUBLE,
+               String=>NC_STRING}
 
 
 function _nc_op(fname::String,omode::Uint16)
