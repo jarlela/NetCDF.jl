@@ -14,6 +14,7 @@ const NC_INT64 =10
 const NC_FLOAT=5
 const NC_LONG=4
 const NC_DOUBLE =6
+const NC_STRING =12
 const NC_GLOBAL=-1
 const NC_CLOBBER=0x0000
 const NC_NOCLOBBER=0x0004
@@ -95,7 +96,9 @@ for (jlname, fname, outtype, argtypes, argsyms, ex_error) in
       (:_nc_get_vara_short_c,:nc_get_vara_short,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Int16}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error reading variable"))),
       (:_nc_get_vara_text_c,:nc_get_vara_text,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Uint8}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error reading variable"))),
       (:_nc_get_vara_schar_c,:nc_get_vara_schar,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Int8}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error reading variable"))),
-      
+      (:_nc_get_vara_string_c,:nc_get_vara_string,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Ptr{Uint8}}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error reading variable"))),
+    
+      (:_nc_put_vara_string_c,:nc_put_vara_string,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Ptr{Uint8}}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error writing variable"))),
       (:_nc_put_vara_schar_c,:nc_put_vara_schar,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Int8}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error writing variable"))),
       (:_nc_put_vara_text_c,:nc_put_vara_text,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Uint8}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error writing variable"))),
       (:_nc_put_vara_double_c,:nc_put_vara_double,Int32,(Int32,Int32,Ptr{Uint},Ptr{Uint},Ptr{Float64}),(:ncid,:varid,:start,:count,:retvalsa),:(error("Error writing variable"))),
@@ -111,6 +114,8 @@ for (jlname, fname, outtype, argtypes, argsyms, ex_error) in
       (:_nc_def_dim_c,:nc_def_dim,Int32,(Int32,Ptr{Uint8},Int32,Ptr{Int32}),(:ncid,:name,:len,:dimida),:(error("Error creating dimension"))),
       (:_nc_def_var_c,:nc_def_var,Int32,(Int32,Ptr{Uint8},Int32,Int32,Ptr{Int32},Ptr{Int32}),(:ncid,:name,:xtype,:ndims,:dimida,:varida),:(error("Error creating variable"))),
       (:_nc_def_var_deflate_c,:nc_def_var_deflate,Int32,(Int32,Int32,Int32,Int32,Int32),(:ncid,:varid,:shuffle,:deflate,:deflate_level),:(error("Error setting compression"))),
+      (:_nc_free_string_c,:nc_free_string,Int32,(Uint,Ptr{Ptr{Uint8}}),(:lena,:valsa),:(error("Error freeing string"))),
+
      );
      
     

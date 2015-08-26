@@ -1,7 +1,7 @@
 module NetCDF
 include("netcdf_c_wrappers.jl")
 import Base.show
-export show,NcDim,NcVar,NcFile,ncread,ncread!,ncwrite,nccreate,ncsync,ncinfo,ncclose,ncputatt,NC_BYTE,NC_SHORT,NC_INT,NC_INT64,NC_FLOAT,NC_DOUBLE, ncgetatt,NC_NOWRITE,NC_WRITE,NC_CLOBBER,NC_NOCLOBBER,NC_CLASSIC_MODEL,NC_64BIT_OFFSET,NC_NETCDF4
+export show,NcDim,NcVar,NcFile,ncread,ncread!,ncwrite,nccreate,ncsync,ncinfo,ncclose,ncputatt,NC_BYTE,NC_SHORT,NC_INT,NC_INT64,NC_FLOAT,NC_DOUBLE,NC_STRING, ncgetatt,NC_NOWRITE,NC_WRITE,NC_CLOBBER,NC_NOCLOBBER,NC_CLASSIC_MODEL,NC_64BIT_OFFSET,NC_NETCDF4
 #Some constants
 
 
@@ -10,14 +10,16 @@ jltype2nctype={ Int8=>NC_BYTE,
                 Int32=>NC_INT,
                 Int64=>NC_INT64,
                 Float32=>NC_FLOAT,
-                Float64=>NC_DOUBLE}
+                Float64=>NC_DOUBLE,
+                String=>NC_STRING}
 
 nctype2string={ NC_BYTE=>"BYTE",
                 NC_SHORT=>"SHORT",
                 NC_INT=>"INT",
                 NC_INT64=>"INT64",
                 NC_FLOAT=>"FLOAT",
-                NC_DOUBLE=>"DOUBLE"}
+                NC_DOUBLE=>"DOUBLE",
+                NC_STRING=>"STRING"}
 
 
 type NcDim
@@ -124,6 +126,7 @@ function readvar{T<:Integer}(nc::NcFile, varname::String;start::Array{T,1}=Array
                nc.vars[varname].nctype==NC_SHORT ? Array(Int32,p) :
                nc.vars[varname].nctype==NC_CHAR ? Array(Uint8,p) :
                nc.vars[varname].nctype==NC_BYTE ? Array(Int8,p) :
+               nc.vars[varname].nctype==NC_STRING ? Array(String,p) :
                nothing
     
     retvalsa == nothing && error("NetCDF type currently not supported, please file an issue on https://github.com/meggart/NetCDF.jl")
@@ -144,6 +147,15 @@ nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Ui
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int32})=_nc_get_vara_int_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Uint8})=_nc_get_vara_text_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int8})=_nc_get_vara_schar_c(ncid,varid,start,count,retvalsa)
+function nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{String})
+  retvalsa_c = Array(Ptr{Uint8}, length(retvalsa))
+  _nc_get_vara_string_c(ncid,varid,start,count,retvalsa_c)
+  for i=1:length(retvalsa)
+    retvalsa[i] = bytestring(retvalsa_c[i])
+  end
+  _nc_free_string_c(length(retvalsa_c),retvalsa_c)
+  return retvalsa
+end
 
 
 function putatt(ncid::Integer,varid::Integer,atts::Dict)
@@ -205,6 +217,9 @@ function putvar{T<:Integer}(nc::NcFile,varname::String,vals::Array;start::Array{
     _nc_put_vara_text_c(ncid,varid,start,count,ascii(x))
   elseif nc.vars[varname].nctype==NC_BYTE
     _nc_put_vara_schar_c(ncid,varid,start,count,int8(x))
+  elseif nc.vars[varname].nctype==NC_STRING
+    x_p = map((y)->pointer(y.data),x)
+    _nc_put_vara_string_c(ncid,varid,start,count,x_p)
   end
   NC_VERBOSE ? println("Successfully wrote to file ",ncid) : nothing
 end
