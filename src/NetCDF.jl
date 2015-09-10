@@ -356,7 +356,7 @@ function close(nco::NcFile)
   return nco.ncid
 end
 
-
+open(fil::String, mode::Integer, readdimvar::Bool)=open(fil, mode=mode, readdimvar=readdimvar)
 function open(fil::String; mode::Integer=NC_NOWRITE, readdimvar::Bool=false)
   # Open netcdf file
   ncid=_nc_op(fil,mode)
@@ -434,7 +434,7 @@ end
 # if the file does not exist, it will be created
 # if the file already exists, the variable will be added to the file
 
-function nccreate(fil::String,varname::String,dims...;atts::Dict=Dict{Any,Any}(),gatts::Dict=Dict{Any,Any}(),compress::Integer=-1,t::Union(Integer,Type)=NC_DOUBLE,mode::Uint16=NC_NETCDF4)
+function nccreate(fil::String,varname::String,dims...;atts::Dict=Dict{Any,Any}(),gatts::Dict=Dict{Any,Any}(),compress::Integer=-1,t::Union(DataType,Integer)=NC_DOUBLE,mode::Uint16=NC_NETCDF4)
   # Checking dims argument for correctness
   dim=parsedimargs(dims)
   # open the file
