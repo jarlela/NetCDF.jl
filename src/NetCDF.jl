@@ -145,6 +145,7 @@ nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Ui
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Float32})=_nc_get_vara_float_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int64})=_nc_get_vara_longlong_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int32})=_nc_get_vara_int_c(ncid,varid,start,count,retvalsa)
+nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int16})=_nc_get_vara_short_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Uint8})=_nc_get_vara_text_c(ncid,varid,start,count,retvalsa)
 nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{Int8})=_nc_get_vara_schar_c(ncid,varid,start,count,retvalsa)
 function nc_get_vara_x!(ncid::Integer,varid::Integer,start::Vector{Uint},count::Vector{Uint},retvalsa::Array{String})
